@@ -25,32 +25,41 @@ developmentChains.includes(network.name)
                           console.log("WinnerPicked event fired")
 
                           try {
-                              // add our asserts
-                              const recentWinner = await raffle.getRecentWinner()
-                              const raffleState = await raffle.getRaffleState()
-                              const winnerEndingBalance = await accounts[0].getBalance()
-                              const endingTimeStamp = await getLastTimeStamp()
+                              setTimeout(async () => {
+                                  // add our asserts
+                                  const recentWinner = await raffle.getRecentWinner()
+                                  const raffleState = await raffle.getRaffleState()
+                                  const winnerEndingBalance = await accounts[0].getBalance()
+                                  const endingTimeStamp = await raffle.getLastTimeStamp()
 
-                              await expect(raffle.getPlayer(0)).to.be.reverted
-                              assert.equal(recentWinner.toString(), accounts[0].address)
-                              assert.equal(raffleState, 0)
-                              assert.equal(
-                                  winnerEndingBalance.toString(),
-                                  winnerStartingBalance.add(raffleEntranceFee).toString()
-                              )
-                              assert(endingTimeStamp > startingTimeStamp)
-                              resolve()
+                                  console.log("1")
+
+                                  await expect(raffle.getPlayer(0)).to.be.reverted
+                                  assert.equal(recentWinner.toString(), accounts[0].address)
+                                  assert.equal(raffleState, 0)
+                                  assert.equal(
+                                      winnerEndingBalance.toString(),
+                                      winnerStartingBalance.add(raffleEntranceFee).toString()
+                                  )
+                                  assert(endingTimeStamp > startingTimeStamp)
+                                  console.log("2")
+                                  resolve()
+                              }, 15000)
                           } catch (error) {
                               console.log(error)
                               reject(e)
                           }
                       })
-                  })
-                  // enter the raffle
-                  await raffle.enterRaffle({ value: raffleEntranceFee })
-                  const winnerStartingBalance = await accounts[0].getBalance()
 
-                  // and this code wont end until our listener hs finished listening
+                      // enter the raffle
+                      console.log("3")
+                      const tx = await raffle.enterRaffle({ value: raffleEntranceFee })
+                      await tx.wait(6)
+                      console.log("4")
+                      const winnerStartingBalance = await accounts[0].getBalance()
+                      console.log("winnerStartingBalance: ", winnerStartingBalance.toString())
+                      // and this code wont end until our listener hs finished listening
+                  })
               })
           })
       })
